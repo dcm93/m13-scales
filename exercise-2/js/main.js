@@ -1,6 +1,6 @@
 /* Create a scatter plot of 1960 life expectancy (gdp) versus 2013 life expectancy (life_expectancy).*/
 
-$(function() {
+$(function () {
     // Graph margin settings
     var margin = {
         top: 10,
@@ -20,51 +20,61 @@ $(function() {
     /************************************** Create chart wrappers ***************************************/
     // Create a variable `svg` by selecting the element with id `vis` and appending an svg
     // Set the width and height to your `width` and `height` variables
+    var div = d3.select('#vis');
+    var svg = div.append('svg').attr('width', width).attr('height', height).attr('id', 'mySVG');
 
 
     // Append a `g` element to your svg in which you'll draw your bars. Store the element in a variable called `g`, and
+    var g = svg.append('g').attr('width', drawWidth).attr('height', drawHeight);
     // Transform the g using `margin.left` and `margin.top`
-
+    g.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
     // Load data in using d3's csv function.
-    d3.csv('data/prepped_data.csv', function(error, data) {
-
+    d3.csv('data/prepped_data.csv', function (error, data) {
         /************************************** Defining scales ***************************************/
         // Find the maximum GDP value for the maximum of the x Scale, and multiply it by 1.05 (to add space)
-
-
+        function unpack(rows, key) {
+            return rows.map(function (row) { return row[key]; });
+        }
+        var xmax = d3.max(data, function (d) { return +d.gdp }) * 1.05;
         // Find the minimum GDP value for the minimum of the x Scale, and multiply it by .85 (to add space)
-
+        var xmin = d3.min(data, function (d) { return +d.gdp }) * 0.85;
 
         // Use `d3.scaleLog` to define a variable `xScale` with the appropriate domain and range
-
+        var xScale = d3.scaleLog()
+            // what values will be included
+            .domain([xmin, xmax])
+            // how many pixels we will have to draw
+            .range([0, drawWidth]);
 
         // Find the maximum life expectance value for the maximum of the y Scale, and multiply it by 1.05 (to add space)
-
-
-        // Find the minimum life expectance value for the minimum of the y Scale, and multiply it by .9 (to add space)
-
+        var ymax = d3.max(data, function (d) { return +d.life_expectancy }) * 1.05;
+        // Find the minimum life expectancy value for the minimum of the y Scale, and multiply it by .9 (to add space)
+        var ymin = d3.min(data, function (d) { return +d.life_expectancy }) * 0.9;
 
         // Use `d3.scaleLinear` to define a variable `yScale` with the appropriate domain and range
-
+        var yScale = d3.scaleLinear()
+            .domain([ymax, ymin])
+            //if you give ymin to yScale, you will get drawHeight back, because we set this to be the min value in the scale (since we use -y axis, in this case is backwards-> min in the plot is the max in the data)
+            .range([drawHeight, 0]);
 
         /************************************** Defining axes ***************************************/
 
         // Define x axis using d3.axisBottom, assigning the scale as the xScale
-
+        var xaxis = d3.axisBottom(xScale);
 
         // Define y axis using d3.axisLeft(), assigning the scale as the yScale
-
+        var yaxis = d3.axisLeft(yScale);
 
         /************************************** Rendering axes and labels ***************************************/
 
         // Append a g to your SVG as an x axis label, specifying the 'transform' attribute to position it
         // Make sure to use the `.call` method to render the axis in the label
-
+            var xg = svg.append('g').attr('transform', 'translate(' + margin.left +  ", " + (margin.top + drawHeight) + ")").call(xaxis);
 
         // Append a g to your SVG as a y axis label, specifying the 'transform' attribute to position it
         // Make sure to use the `.call` method to render the axis in the label
-
+            var yg = svg.append('g').attr('transform', 'translate(' + margin.left + ", " + margin.top + ")").call(yaxis);
 
         // Append a text element to your svg to label your x axis, and place it in the proper location
 
