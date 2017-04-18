@@ -1,4 +1,10 @@
-/* Create a barchart of drinking patterns*/
+/* Create a barchart of drinking patterns
+Write a function to filter down your data to the current selection based on the current sex and type
+Write a function for setting the scales based on the current data selection.
+Write a function for updating your axis elements (both the axes, and their labels).
+Write a reusable function to perform your data-join. Within this function you should set your scales, update your axes, and re-render your rectangles.
+Assign an event handler to your input elements to set the sex and/or type, filter your data, then update your chart.
+*/
 $(function() {
     // Read in prepped_data file
     d3.csv('data/prepped_data.csv', function(error, allData) {
@@ -6,17 +12,20 @@ $(function() {
         var sex = 'female';
         var type = 'binge';
 
+        $("label").on('click', function(){
+            var selection = $(this).children().attr('value');
+        })
         // Filter data down
         var data = allData.filter(function(d) {
                 return d.type == type && d.sex == sex
-            })
+        })
             // Sort the data alphabetically
             // Hint: http://stackoverflow.com/questions/6712034/sort-array-by-firstname-alphabetically-in-javascript
-            .sort(function(a, b) {
+        .sort(function(a, b) {
                 if (a.state_name < b.state_name) return -1;
                 if (a.state_name > b.state_name) return 1;
                 return 0;
-            });
+        });
 
         // Margin: how much space to put in the SVG for axes/titles
         var margin = {
@@ -126,6 +135,9 @@ $(function() {
         });
         g.call(tip);
 
+        function draw(){
+
+        }
         // Store the data-join in a function: make sure to set the scales and update the axes in your function.
         // Select all rects and bind data
         var bars = g.selectAll('rect').data(data);
